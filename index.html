@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laporan Pengaduan Fasilitas Sekolah</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ===== Sama seperti sebelumnya, ditambah style untuk tombol ekspor/impor ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f0f4f8;
+            color: #1e293b;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a5f, #2a5f7a);
+            color: #fff;
+            padding: 20px 28px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 24px rgba(30, 58, 95, 0.3);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-left i {
+            font-size: 28px;
+            color: #ffd966;
+        }
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .header-left .sub {
+            font-size: 13px;
+            opacity: 0.85;
+            display: block;
+            margin-top: 2px;
+        }
+        .role-switcher {
+            display: flex;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 5px;
+            border-radius: 14px;
+            backdrop-filter: blur(4px);
+        }
+        .role-switcher button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 11px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.25s;
+        }
+        .role-switcher button.active {
+            background: #fff;
+            color: #1e3a5f;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .role-switcher button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .role-switcher button .lock-icon {
+            font-size: 12px;
+            margin-left: 4px;
+            color: #ffd966;
+        }
+        .reporter-identify {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .reporter-identify label {
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #334155;
+        }
+        .reporter-identify input {
+            padding: 9px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+            background: #fafcff;
+        }
+        .reporter-identify input:focus {
+            outline: none;
+            border-color: #2a5f7a;
+            box-shadow: 0 0 0 4px rgba(42, 95, 122, 0.1);
+        }
+        .reporter-identify .btn-set {
+            padding: 9px 20px;
+            background: #1e3a5f;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .reporter-identify .btn-set:hover {
+            background: #2a5f7a;
+        }
+        .identity-badge {
+            font-weight: 600;
+            color: #1e3a5f;
+            background: #e8edf4;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .panel.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px 32px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+        .form-card h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-card h2 i {
+            color: #2a5f7a;
+        }
+        .form-card .desc {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 28px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-group label .required {
+            color: #dc2626;
+            font-weight: 700;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fafcff;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5f7a;
+            box-shadow: 0 0 0 4px rgba(42, 95, 122, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .btn-submit {
+            grid-column: 1 / -1;
+            padding: 13px;
+            background: linear-gradient(135deg, #1e3a5f, #2a5f7a);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3);
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .my-complaints {
+            margin-top: 28px;
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px 28px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+        .my-complaints h3 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .my-complaints .empty {
+            color: #94a3b8;
+            text-align: center;
+            padding: 30px 10px;
+            font-size: 15px;
+        }
+        .my-complaints .empty i {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+        }
+        .my-complaint-item {
+            border: 1px solid #eef2f6;
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #fafcff;
+            transition: 0.15s;
+        }
+        .my-complaint-item:hover {
+            border-color: #d1d9e6;
+        }
+        .my-complaint-item .info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .my-complaint-item .info .title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .my-complaint-item .info .meta {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 2px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .my-complaint-item .info .desc {
+            font-size: 14px;
+            color: #475569;
+            margin-top: 4px;
+        }
+        .status-badge {
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .status-pending::before { content: '⏳ '; }
+        .status-proses {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .status-proses::before { content: '🔄 '; }
+        .status-selesai {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-selesai::before { content: '✅ '; }
+
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .stats-row .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 22px;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-left: 4px solid #2a5f7a;
+        }
+        .stats-row .stat-card .num {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+        .stats-row .stat-card .label {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .stats-row .stat-card .icon {
+            font-size: 28px;
+            color: #2a5f7a;
+            opacity: 0.5;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .dashboard-header h2 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-area {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-area input,
+        .filter-area select {
+            padding: 9px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fff;
+        }
+        .filter-area input:focus,
+        .filter-area select:focus {
+            outline: none;
+            border-color: #2a5f7a;
+        }
+        .filter-area input {
+            min-width: 200px;
+        }
+        .table-wrap {
+            background: #fff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+        .table-scroll {
+            overflow-x: auto;
+            padding: 0 4px 4px 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 650px;
+        }
+        thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #475569;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: 0.15s;
+        }
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+        tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+        }
+        .td-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: capitalize;
+        }
+        .td-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .td-actions button {
+            border: none;
+            background: transparent;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-status {
+            background: #eef2f6;
+            color: #334155;
+        }
+        .btn-status:hover {
+            background: #d1d9e6;
+        }
+        .btn-delete {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-delete:hover {
+            background: #fecaca;
+        }
+        .empty-row td {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+            font-size: 15px;
+        }
+        .empty-row td i {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+        }
+
+        /* Tombol Ekspor / Impor */
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .data-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-export {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .btn-export:hover {
+            background: #bfdbfe;
+        }
+        .btn-import {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .btn-import:hover {
+            background: #a7f3d0;
+        }
+        .file-input-hidden {
+            display: none;
+        }
+
+        /* Modal Login */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        .login-overlay.open {
+            display: flex;
+        }
+        .login-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 36px 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+            animation: modalIn 0.3s ease;
+        }
+        .login-box h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .login-box p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            margin-bottom: 16px;
+            transition: 0.2s;
+        }
+        .login-box input:focus {
+            outline: none;
+            border-color: #2a5f7a;
+            box-shadow: 0 0 0 4px rgba(42, 95, 122, 0.1);
+        }
+        .login-box .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #1e3a5f;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .login-box .btn-login:hover {
+            background: #2a5f7a;
+        }
+        .login-box .login-error {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+        .login-box .login-error.show {
+            display: block;
+        }
+        .login-box .btn-logout {
+            width: 100%;
+            padding: 10px;
+            background: #eef2f6;
+            color: #334155;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .login-box .btn-logout:hover {
+            background: #e2e8f0;
+        }
+        .admin-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 8px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px 36px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box h3 {
+            font-size: 20px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-box .modal-sub {
+            color: #475569;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+        .modal-box select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            margin-bottom: 18px;
+            background: #fafcff;
+        }
+        .modal-box select:focus {
+            outline: none;
+            border-color: #2a5f7a;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-actions .btn-cancel {
+            background: #eef2f6;
+            color: #334155;
+        }
+        .modal-actions .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+        .modal-actions .btn-primary {
+            background: #1e3a5f;
+            color: #fff;
+        }
+        .modal-actions .btn-primary:hover {
+            background: #2a5f7a;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+        .toast {
+            padding: 14px 24px;
+            background: #1e293b;
+            color: #fff;
+            border-radius: 14px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 380px;
+        }
+        .toast.success { background: #065f46; }
+        .toast.error { background: #991b1b; }
+        .toast.info { background: #1e3a5f; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: stretch; text-align: center; padding: 18px 20px; }
+            .header-left { justify-content: center; }
+            .role-switcher { justify-content: center; flex-wrap: wrap; }
+            .reporter-identify { flex-direction: column; align-items: stretch; text-align: center; }
+            .reporter-identify input { min-width: unset; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-card { padding: 20px 16px; }
+            .dashboard-header { flex-direction: column; align-items: stretch; }
+            .filter-area { flex-direction: column; }
+            .filter-area input { min-width: unset; width: 100%; }
+            .stats-row .stat-card { min-width: 80px; padding: 12px 16px; }
+            .my-complaint-item { flex-direction: column; align-items: stretch; }
+            .td-actions { flex-direction: column; align-items: flex-start; }
+            .toast-container { left: 20px; right: 20px; bottom: 20px; }
+            .toast { max-width: 100%; }
+            .modal-box, .login-box { padding: 24px 20px; }
+            .data-actions { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .header-left h1 { font-size: 18px; }
+            .role-switcher button { font-size: 12px; padding: 6px 14px; }
+            table { font-size: 13px; min-width: 550px; }
+            thead th, tbody td { padding: 10px 12px; }
+            .stats-row .stat-card .num { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <i class="fas fa-school"></i>
+                <div>
+                    <h1>Sistem Pengaduan Fasilitas</h1>
+                    <span class="sub">Sekolah Menengah Kebangsaan</span>
+                </div>
+            </div>
+            <div class="role-switcher" id="roleSwitcher">
+                <button class="active" data-role="reporter"><i class="fas fa-user"></i> Pelapor</button>
+                <button data-role="monitor" id="monitorTabBtn">
+                    <i class="fas fa-eye"></i> Pengawas 
+                    <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="reporter-identify" id="reporterIdentity">
+            <label for="reporterNameInput"><i class="fas fa-id-badge"></i> Nama Anda:</label>
+            <input type="text" id="reporterNameInput" placeholder="Masukkan nama lengkap..." value="Ahmad Fauzi" />
+            <button class="btn-set" id="setReporterBtn"><i class="fas fa-check"></i> Set</button>
+            <span class="identity-badge"><i class="fas fa-user"></i> <span id="displayName">Ahmad Fauzi</span></span>
+        </div>
+
+        <section class="panel active" id="panelReporter">
+            <div class="form-card">
+                <h2><i class="fas fa-edit"></i> Buat Laporan Baru</h2>
+                <p class="desc">Laporkan kerusakan atau masalah fasilitas sekolah. Status laporan akan diperbarui oleh pengawas.</p>
+                <form id="complaintForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Nama Pelapor <span class="required">*</span></label>
+                            <input type="text" id="formReporterName" readonly style="background:#f1f5f9; cursor:not-allowed;" />
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-building"></i> Jenis Fasilitas <span class="required">*</span></label>
+                            <select id="formFacility" required>
+                                <option value="">-- Pilih --</option>
+                                <option value="Kelas">Kelas</option>
+                                <option value="Laboratorium">Laboratorium</option>
+                                <option value="Perpustakaan">Perpustakaan</option>
+                                <option value="Kamar Mandi">Kamar Mandi</option>
+                                <option value="Kantin">Kantin</option>
+                                <option value="Lapangan">Lapangan</option>
+                                <option value="Aula">Aula</option>
+                                <option value="Mushola">Mushola</option>
+                                <option value="Parkir">Parkir</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-pin"></i> Lokasi Spesifik <span class="required">*</span></label>
+                            <input type="text" id="formLocation" placeholder="Contoh: Gedung A, Lantai 2" required />
+                        </div>
+                        <div class="form-group full">
+                            <label><i class="fas fa-align-left"></i> Deskripsi Masalah <span class="required">*</span></label>
+                            <textarea id="formDescription" placeholder="Jelaskan secara rinci kerusakan atau masalah..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i> Kirim Laporan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="my-complaints">
+                <h3><i class="fas fa-list-ul"></i> Laporan Saya</h3>
+                <div id="myComplaintsList"></div>
+            </div>
+        </section>
+
+        <section class="panel" id="panelMonitor">
+            <div class="stats-row">
+                <div class="stat-card"><div class="icon"><i class="fas fa-clipboard-list"></i></div><div><div class="num" id="monTotal">0</div><div class="label">Total Laporan</div></div></div>
+                <div class="stat-card" style="border-left-color:#b45309;"><div class="icon"><i class="fas fa-clock" style="color:#b45309;"></i></div><div><div class="num" id="monPending">0</div><div class="label">Menunggu</div></div></div>
+                <div class="stat-card" style="border-left-color:#1e40af;"><div class="icon"><i class="fas fa-spinner" style="color:#1e40af;"></i></div><div><div class="num" id="monProses">0</div><div class="label">Diproses</div></div></div>
+                <div class="stat-card" style="border-left-color:#065f46;"><div class="icon"><i class="fas fa-check-circle" style="color:#065f46;"></i></div><div><div class="num" id="monSelesai">0</div><div class="label">Selesai</div></div></div>
+            </div>
+
+            <div class="dashboard-header">
+                <h2><i class="fas fa-clipboard-list"></i> Semua Pengaduan</h2>
+                <div class="data-actions">
+                    <button class="btn-export" id="exportBtn"><i class="fas fa-download"></i> Ekspor Data</button>
+                    <button class="btn-import" id="importBtn"><i class="fas fa-upload"></i> Impor Data</button>
+                    <input type="file" id="importFileInput" class="file-input-hidden" accept=".json" />
+                </div>
+            </div>
+            <div class="filter-area" style="margin-bottom: 16px;">
+                <input type="text" id="monSearch" placeholder="🔍 Cari nama / lokasi..." />
+                <select id="monFilterStatus">
+                    <option value="semua">Semua Status</option>
+                    <option value="pending">Menunggu</option>
+                    <option value="proses">Diproses</option>
+                    <option value="selesai">Selesai</option>
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Pelapor</th><th>Fasilitas</th>
+                                <th>Lokasi</th><th>Deskripsi</th><th>Status</th><th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal Login Admin -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> Akses Pengawas</h2>
+            <p>Masukkan password untuk mengelola laporan.</p>
+            <input type="password" id="loginPassword" placeholder="Password" />
+            <button class="btn-login" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <div class="login-error" id="loginError">Password salah. Silakan coba lagi.</div>
+            <button class="btn-logout" id="logoutBtn" style="display:none;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- Modal Ubah Status -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <h3 id="modalTitle"><i class="fas fa-pen"></i> Ubah Status</h3>
+            <div class="modal-sub" id="modalSub">Ubah status pengaduan ini.</div>
+            <select id="modalStatusSelect">
+                <option value="pending">⏳ Menunggu</option>
+                <option value="proses">🔄 Diproses</option>
+                <option value="selesai">✅ Selesai</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="modalCancel">Batal</button>
+                <button class="btn-primary" id="modalConfirm">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ===== KONFIGURASI =====
+        const ADMIN_PASSWORD = 'admin123'; // Ganti sesuai keinginan
+
+        // ===== DATA =====
+        const STORAGE_KEY = 'school_complaints_v3';
+        let complaints = [];
+        let currentRole = 'reporter';
+        let reporterName = 'Ahmad Fauzi';
+        let editingId = null;
+        let isAdmin = false;
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try { complaints = JSON.parse(raw); } catch { complaints = []; }
+            } else {
+                complaints = [
+                    { id: Date.now() - 200000, reporter: 'Ahmad Fauzi', facility: 'Kelas', location: 'Gedung B, Lantai 3', description: 'Lampu ruangan mati total.', status: 'pending', createdAt: new Date(Date.now() - 200000).toISOString() },
+                    { id: Date.now() - 120000, reporter: 'Siti Rahma', facility: 'Kamar Mandi', location: 'Blok C', description: 'Pipa air pecah, air menggenang.', status: 'proses', createdAt: new Date(Date.now() - 120000).toISOString() },
+                    { id: Date.now() - 40000, reporter: 'Budi Santoso', facility: 'Perpustakaan', location: 'Lantai 2', description: 'AC tidak dingin.', status: 'selesai', createdAt: new Date(Date.now() - 40000).toISOString() }
+                ];
+                saveData();
+            }
+            complaints.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(complaints));
+        }
+
+        function generateId() { return Date.now() + Math.random() * 1000; }
+        function formatDate(iso) { return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        function getStatusLabel(status) { return { pending: 'Menunggu', proses: 'Diproses', selesai: 'Selesai' } [status] || status; }
+        function getStatusClass(status) { return 'status-' + status; }
+        function getStatusEmoji(status) { return { pending: '⏳', proses: '🔄', selesai: '✅' } [status] || ''; }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            toast.innerHTML = `${icon} ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(20px)'; setTimeout(() => toast.remove(), 300); }, 3500);
+        }
+
+        // ===== RENDER =====
+        function renderMyComplaints() {
+            const container = document.getElementById('myComplaintsList');
+            const myData = complaints.filter(c => c.reporter === reporterName);
+            if (myData.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-inbox"></i>Belum ada laporan yang Anda kirim.</div>`;
+                return;
+            }
+            let html = '';
+            myData.forEach(c => {
+                html += `
+                    <div class="my-complaint-item">
+                        <div class="info">
+                            <div class="title">${c.facility} — ${c.location}</div>
+                            <div class="meta"><span><i class="far fa-calendar-alt"></i> ${formatDate(c.createdAt)}</span><span><i class="fas fa-tag"></i> ${c.facility}</span></div>
+                            <div class="desc">${c.description}</div>
+                        </div>
+                        <div><span class="status-badge ${getStatusClass(c.status)}">${getStatusEmoji(c.status)} ${getStatusLabel(c.status)}</span></div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMonitorTable() {
+            const tbody = document.getElementById('monTableBody');
+            const search = document.getElementById('monSearch').value.toLowerCase().trim();
+            const filter = document.getElementById('monFilterStatus').value;
+            let filtered = complaints.filter(c => {
+                const matchSearch = c.reporter.toLowerCase().includes(search) || c.location.toLowerCase().includes(search) || c.facility.toLowerCase().includes(search) || c.description.toLowerCase().includes(search);
+                const matchStatus = filter === 'semua' || c.status === filter;
+                return matchSearch && matchStatus;
+            });
+
+            document.getElementById('monTotal').textContent = complaints.length;
+            document.getElementById('monPending').textContent = complaints.filter(c => c.status === 'pending').length;
+            document.getElementById('monProses').textContent = complaints.filter(c => c.status === 'proses').length;
+            document.getElementById('monSelesai').textContent = complaints.filter(c => c.status === 'selesai').length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="7"><i class="fas fa-inbox"></i>Tidak ada pengaduan ditemukan.</td></tr>`;
+                return;
+            }
+            let html = '';
+            filtered.forEach((c, i) => {
+                html += `
+                    <tr>
+                        <td><strong>${i+1}</strong></td>
+                        <td><strong>${c.reporter}</strong></td>
+                        <td>${c.facility}</td>
+                        <td>${c.location}</td>
+                        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${c.description}">${c.description}</td>
+                        <td><span class="td-status ${getStatusClass(c.status)}">${getStatusEmoji(c.status)} ${getStatusLabel(c.status)}</span></td>
+                        <td>
+                            <div class="td-actions">
+                                <button class="btn-status" data-id="${c.id}" title="Ubah Status"><i class="fas fa-sync-alt"></i></button>
+                                <button class="btn-delete" data-id="${c.id}" title="Hapus"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderAll() {
+            document.getElementById('formReporterName').value = reporterName;
+            document.getElementById('displayName').textContent = reporterName;
+            renderMyComplaints();
+            renderMonitorTable();
+            document.getElementById('submitBtn').disabled = (reporterName.trim() === '');
+        }
+
+        // ===== CRUD =====
+        function addComplaint(data) {
+            const newComplaint = {
+                id: generateId(),
+                reporter: data.reporter,
+                facility: data.facility,
+                location: data.location,
+                description: data.description,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            complaints.unshift(newComplaint);
+            saveData();
+            renderAll();
+            showToast('Pengaduan berhasil dikirim!', 'success');
+        }
+
+        function deleteComplaint(id) {
+            if (!isAdmin) { showToast('Anda harus login sebagai pengawas.', 'error'); return; }
+            complaints = complaints.filter(c => c.id !== id);
+            saveData();
+            renderAll();
+            showToast('Pengaduan dihapus.', 'info');
+        }
+
+        function updateStatus(id, newStatus) {
+            if (!isAdmin) { showToast('Anda harus login sebagai pengawas.', 'error'); return; }
+            const item = complaints.find(c => c.id === id);
+            if (item) {
+                item.status = newStatus;
+                saveData();
+                renderAll();
+                showToast(`Status diubah menjadi "${getStatusLabel(newStatus)}"`, 'success');
+            }
+        }
+
+        // ===== EKSPOR & IMPOR DATA =====
+        function exportData() {
+            if (!isAdmin) { showToast('Login sebagai pengawas untuk ekspor data.', 'error'); return; }
+            const dataStr = JSON.stringify(complaints, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `laporan_pengaduan_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data berhasil diekspor!', 'success');
+        }
+
+        function importData(file) {
+            if (!isAdmin) { showToast('Login sebagai pengawas untuk impor data.', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!Array.isArray(imported)) {
+                        showToast('Format file tidak valid.', 'error');
+                        return;
+                    }
+                    // Gabungkan data: jika ID sama, timpa; jika baru, tambahkan
+                    let added = 0, updated = 0;
+                    imported.forEach(item => {
+                        // Pastikan item memiliki properti yang diperlukan
+                        if (!item.id || !item.reporter || !item.facility || !item.location || !item.description || !item.status || !item.createdAt) {
+                            return; // skip item tidak lengkap
+                        }
+                        const existingIndex = complaints.findIndex(c => c.id === item.id);
+                        if (existingIndex !== -1) {
+                            complaints[existingIndex] = item;
+                            updated++;
+                        } else {
+                            complaints.push(item);
+                            added++;
+                        }
+                    });
+                    // Urutkan ulang
+                    complaints.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    saveData();
+                    renderAll();
+                    showToast(`Impor berhasil: ${added} laporan baru, ${updated} laporan diperbarui.`, 'success');
+                } catch (err) {
+                    showToast('Gagal membaca file. Pastikan file JSON valid.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ===== MODAL =====
+        function openStatusModal(id) {
+            if (!isAdmin) { showToast('Anda harus login sebagai pengawas.', 'error'); return; }
+            const item = complaints.find(c => c.id === id);
+            if (!item) return;
+            editingId = id;
+            document.getElementById('modalTitle').innerHTML = `<i class="fas fa-pen"></i> Ubah Status`;
+            document.getElementById('modalSub').textContent = `Pengaduan oleh "${item.reporter}" — ${item.facility} di ${item.location}`;
+            document.getElementById('modalStatusSelect').value = item.status;
+            document.getElementById('modalOverlay').classList.add('open');
+        }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            editingId = null;
+        }
+
+        // ===== LOGIN / LOGOUT =====
+        function showLoginModal() {
+            document.getElementById('loginOverlay').classList.add('open');
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('loginPassword').focus();
+        }
+
+        function hideLoginModal() {
+            document.getElementById('loginOverlay').classList.remove('open');
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('loginPassword').value;
+            if (pass === ADMIN_PASSWORD) {
+                isAdmin = true;
+                hideLoginModal();
+                const monitorBtn = document.getElementById('monitorTabBtn');
+                monitorBtn.innerHTML = `<i class="fas fa-eye"></i> Pengawas <span class="admin-badge"><i class="fas fa-check-circle"></i> Admin</span>`;
+                const lockIcon = monitorBtn.querySelector('.lock-icon');
+                if (lockIcon) lockIcon.style.display = 'none';
+                setRole('monitor');
+                showToast('Login berhasil! Anda sekarang memiliki akses pengawas.', 'success');
+                sessionStorage.setItem('admin_logged', 'true');
+            } else {
+                document.getElementById('loginError').classList.add('show');
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginPassword').focus();
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            sessionStorage.removeItem('admin_logged');
+            const monitorBtn = document.getElementById('monitorTabBtn');
+            monitorBtn.innerHTML = `<i class="fas fa-eye"></i> Pengawas <span class="lock-icon"><i class="fas fa-lock"></i></span>`;
+            setRole('reporter');
+            showToast('Anda telah logout dari akses pengawas.', 'info');
+            hideLoginModal();
+        }
+
+        // ===== ROLE =====
+        function setRole(role) {
+            if (role === 'monitor' && !isAdmin) {
+                showLoginModal();
+                return;
+            }
+            currentRole = role;
+            document.querySelectorAll('.role-switcher button').forEach(btn => btn.classList.toggle('active', btn.dataset.role === role));
+            document.getElementById('panelReporter').classList.toggle('active', role === 'reporter');
+            document.getElementById('panelMonitor').classList.toggle('active', role === 'monitor');
+            document.getElementById('reporterIdentity').style.display = role === 'reporter' ? 'flex' : 'none';
+            renderAll();
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.querySelectorAll('.role-switcher button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const role = this.dataset.role;
+                if (role === 'monitor' && !isAdmin) {
+                    showLoginModal();
+                    return;
+                }
+                setRole(role);
+            });
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', loginAdmin);
+        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') loginAdmin();
+        });
+        document.getElementById('logoutBtn').addEventListener('click', logoutAdmin);
+
+        document.getElementById('loginOverlay').addEventListener('click', function(e) {
+            if (e.target === this && !isAdmin) {
+                hideLoginModal();
+                setRole('reporter');
+            }
+        });
+
+        // Set reporter name
+        document.getElementById('setReporterBtn').addEventListener('click', function() {
+            const name = document.getElementById('reporterNameInput').value.trim();
+            if (!name) { showToast('Nama tidak boleh kosong.', 'error'); return; }
+            reporterName = name;
+            localStorage.setItem('reporter_name', name);
+            renderAll();
+            showToast(`Nama diubah menjadi "${reporterName}"`, 'info');
+        });
+        document.getElementById('reporterNameInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') document.getElementById('setReporterBtn').click(); });
+
+        // Form submit
+        document.getElementById('complaintForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (reporterName.trim() === '') { showToast('Masukkan nama Anda terlebih dahulu.', 'error'); return; }
+            const facility = document.getElementById('formFacility').value;
+            const location = document.getElementById('formLocation').value.trim();
+            const description = document.getElementById('formDescription').value.trim();
+            if (!facility || !location || !description) { showToast('Harap isi semua bidang wajib (*)', 'error'); return; }
+            addComplaint({ reporter: reporterName, facility, location, description });
+            document.getElementById('formFacility').value = '';
+            document.getElementById('formLocation').value = '';
+            document.getElementById('formDescription').value = '';
+        });
+
+        // Table actions
+        document.getElementById('monTableBody').addEventListener('click', function(e) {
+            const target = e.target.closest('button');
+            if (!target) return;
+            const id = Number(target.dataset.id);
+            if (isNaN(id)) return;
+            if (target.classList.contains('btn-status')) {
+                if (!isAdmin) { showToast('Login sebagai pengawas untuk mengubah status.', 'error'); return; }
+                openStatusModal(id);
+            }
+            if (target.classList.contains('btn-delete')) {
+                if (!isAdmin) { showToast('Login sebagai pengawas untuk menghapus.', 'error'); return; }
+                if (confirm('Yakin ingin menghapus pengaduan ini?')) deleteComplaint(id);
+            }
+        });
+
+        // Modal controls
+        document.getElementById('modalCancel').addEventListener('click', closeModal);
+        document.getElementById('modalConfirm').addEventListener('click', function() {
+            if (editingId === null) return;
+            updateStatus(editingId, document.getElementById('modalStatusSelect').value);
+            closeModal();
+        });
+        document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+        // Filter
+        document.getElementById('monSearch').addEventListener('input', renderMonitorTable);
+        document.getElementById('monFilterStatus').addEventListener('change', renderMonitorTable);
+
+        // Ekspor & Impor
+        document.getElementById('exportBtn').addEventListener('click', exportData);
+        document.getElementById('importBtn').addEventListener('click', function() {
+            document.getElementById('importFileInput').click();
+        });
+        document.getElementById('importFileInput').addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                importData(this.files[0]);
+                this.value = ''; // reset agar bisa upload file yang sama lagi
+            }
+        });
+
+        // ===== INIT =====
+        loadData();
+
+        if (sessionStorage.getItem('admin_logged') === 'true') {
+            isAdmin = true;
+            const monitorBtn = document.getElementById('monitorTabBtn');
+            monitorBtn.innerHTML = `<i class="fas fa-eye"></i> Pengawas <span class="admin-badge"><i class="fas fa-check-circle"></i> Admin</span>`;
+            const lockIcon = monitorBtn.querySelector('.lock-icon');
+            if (lockIcon) lockIcon.style.display = 'none';
+        }
+
+        const savedName = localStorage.getItem('reporter_name');
+        if (savedName) {
+            reporterName = savedName;
+            document.getElementById('reporterNameInput').value = reporterName;
+        } else {
+            const first = complaints.find(c => c.reporter);
+            if (first) {
+                reporterName = first.reporter;
+                document.getElementById('reporterNameInput').value = reporterName;
+                localStorage.setItem('reporter_name', reporterName);
+            }
+        }
+
+        setRole('reporter');
+        console.log('✅ Sistem siap. Password admin: ' + ADMIN_PASSWORD);
+        console.log('🔑 Klik "Pengawas" untuk login. Gunakan fitur Ekspor/Impor untuk berbagi data antar perangkat.');
+    </script>
+</body>
+</html>
